@@ -1,14 +1,11 @@
-use pitch_calc::{
-    Letter,
-    Step,
-};
+pub use pitch_calc::{Letter, Step};
 
 use std::collections::BTreeSet;
 
-type Harmony = BTreeSet<Letter>;
-type Chord = Vec<Letter>;
+pub type Harmony = BTreeSet<Letter>;
+pub type Chord = Vec<Letter>;
 
-fn negate_note(note: Letter, root: Letter) -> Letter {
+pub fn negate_note(note: Letter, root: Letter) -> Letter {
     let minor_third = root + Step::from(3_f32).letter();
     let major_third = root + Step::from(4_f32).letter();
     let distance;
@@ -21,7 +18,7 @@ fn negate_note(note: Letter, root: Letter) -> Letter {
     }
 }
 
-fn negate_chord(chord: &[Letter], root: Letter) -> Chord {
+pub fn negate_chord(chord: &[Letter], root: Letter) -> Chord {
     let mut negated = Chord::new();
     for note in chord {
         negated.push(negate_note(*note, root));
@@ -29,7 +26,7 @@ fn negate_chord(chord: &[Letter], root: Letter) -> Chord {
     negated
 }
 
-fn negate_harmony(harmony: &Harmony, root: Letter) -> Harmony {
+pub fn negate_harmony(harmony: &Harmony, root: Letter) -> Harmony {
     let mut negated = Harmony::new();
     for note in harmony {
         negated.insert(negate_note(*note, root));
