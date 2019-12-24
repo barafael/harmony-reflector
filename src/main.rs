@@ -1,11 +1,15 @@
 extern crate rodio;
 
 mod negative_harmony;
+mod sine_player;
+
 use crate::negative_harmony::*;
 
 use rodio::{source::SineWave, Sink, Source};
 
+use crate::sine_player::SineWaves;
 use std::ops::Sub;
+use std::time::Duration;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Hertz(f64);
@@ -72,25 +76,20 @@ fn main() {
     g7.insert(Letter::D);
     g7.insert(Letter::F);
 
-    let negated = negative_harmony::negate_harmony(&cmaj9, Letter::C);
+    let negated = negative_harmony::negate_harmony(&g7, Letter::C);
 
     let device = rodio::default_output_device().unwrap();
 
     let sink = Sink::new(&device);
 
-    let mut sources = Vec::new();
+    let mut freqs = Vec::new();
 
     for note in negated {
         let freq = f64::from(pitch_calc::calc::hz_from_letter_octave(note, 4));
-        let source = SineWave::from(Pitch::new(Hertz::from(freq))).amplify(0.1);
-        sources.push(source);
+        freqs.push(freq as f32);
     }
-    let mix = sources[0]
-        .clone()
-        .mix(sources[1].clone())
-        .mix(sources[2].clone())
-        .mix(sources[3].clone());
 
-    sink.append(mix);
+    let waves = SineWaves::new(freqs);
+    sink.append(waves);
     sink.sleep_until_end();
 }
