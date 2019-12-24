@@ -1,8 +1,5 @@
 use pitch_calc::{
-    Hz,
     Letter,
-    LetterOctave,
-    ScaledPerc,
     Step,
 };
 
@@ -12,24 +9,24 @@ type Harmony = BTreeSet<Letter>;
 type Chord = Vec<Letter>;
 
 fn negate_note(note: Letter, root: Letter) -> Letter {
-    let minor_third = root + Step::from(3 as f32).letter();
-    let major_third = root + Step::from(4 as f32).letter();
+    let minor_third = root + Step::from(3_f32).letter();
+    let major_third = root + Step::from(4_f32).letter();
     let distance;
     if note < minor_third {
         distance = minor_third - note;
-        return major_third + distance;
+        major_third + distance
     } else {
         distance = note - major_third;
-        return minor_third - distance;
+        minor_third - distance
     }
 }
 
-fn negate_chord(chord: &Chord, root: Letter) -> Chord {
+fn negate_chord(chord: &[Letter], root: Letter) -> Chord {
     let mut negated = Chord::new();
     for note in chord {
         negated.push(negate_note(*note, root));
     }
-    return negated;
+    negated
 }
 
 fn negate_harmony(harmony: &Harmony, root: Letter) -> Harmony {
@@ -37,13 +34,12 @@ fn negate_harmony(harmony: &Harmony, root: Letter) -> Harmony {
     for note in harmony {
         negated.insert(negate_note(*note, root));
     }
-    return negated;
+    negated
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::BTreeSet;
 
     #[test]
     fn g7_to_fmi6() {
@@ -57,7 +53,7 @@ mod tests {
 
         let mut fmi6 = Harmony::new();
         fmi6.insert(Letter::F);
-        fmi6.insert(Letter::Gsh);
+        fmi6.insert(Letter::Ab);
         fmi6.insert(Letter::C);
         fmi6.insert(Letter::D);
         assert_eq!(negated, fmi6);
@@ -75,7 +71,7 @@ mod tests {
 
         let mut cmi11 = Harmony::new();
         cmi11.insert(Letter::C);
-        cmi11.insert(Letter::Dsh);
+        cmi11.insert(Letter::Eb);
         cmi11.insert(Letter::F);
         cmi11.insert(Letter::G);
         assert_eq!(negated, cmi11);
@@ -92,7 +88,7 @@ mod tests {
 
         let negated = negate_chord(&dmi, Letter::F);
 
-        let mut expected = vec![Letter::Dsh, Letter::Gsh, Letter::Csh, Letter::C, Letter::F];
+        let expected = vec![Letter::Eb, Letter::Ab, Letter::Db, Letter::C, Letter::F];
         assert_eq!(expected, negated);
     }
 }
